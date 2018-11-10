@@ -49,9 +49,6 @@ class PlayerSprite(arcade.Sprite):
         moment = pymunk.moment_for_box(mass, (width, height))
         body = pymunk.Body(mass, moment)
         body.position = pymunk.Vec2d(x, y)
-        # v = ((-16, 16), (-16, -16), (16, -16), (16, 16), (15, 16), (15, -16), (-15, -15), (15, 16))
-        # v = [Vec2d(16, -16), Vec2d(16, 16), Vec2d(-16, 16), Vec2d(-16, -16)]
-        # shape = pymunk.Poly(body, vertices=v)
         shape = [pymunk.Segment(body, (-14, 14), (-14, -14), 2),
                  pymunk.Segment(body, (-14, -14), (14, -14), 2),
                  pymunk.Segment(body, (14, -14), (14, 14), 2)
@@ -60,6 +57,32 @@ class PlayerSprite(arcade.Sprite):
         # shape.friction = 0.3
         space.add(shape)
         space.add(body)
+        self.body = body
+        super().__init__(filename)
+
+        self.width = width
+        self.height = height
+
+
+class MothershipSprite(arcade.Sprite):
+    def __init__(self, filename, width, height, x, y, mass, space):
+
+        moment = pymunk.moment_for_box(mass, (width, height))
+        body = space.static_body
+        body.position = pymunk.Vec2d(x, y)
+        shape = [pymunk.Segment(body, (-128, -32), (-128, 32), 1),
+                 pymunk.Segment(body, (-128, 32), (-98, 32), 1),
+                 pymunk.Segment(body, (-98, 32), (-98, 0), 1),
+                 pymunk.Segment(body, (-98, 0), (-58, 0), 1),
+                 pymunk.Segment(body, (-58, 0), (-58, 32), 1),
+                 pymunk.Segment(body, (-58, 32), (128, 32), 1),
+                 pymunk.Segment(body, (128, 32), (128, -32), 1),
+                 pymunk.Segment(body, (128, -32), (-128, -32), 1),
+                 ]
+        # print("Player:", shape.get_vertices())
+        # shape.friction = 0.3
+        space.add(shape)
+        # space.add(body)
         self.body = body
         super().__init__(filename)
 
@@ -137,6 +160,20 @@ class MyGame(arcade.Window):
         self.player_sprite.turn_rate = 1
         self.player_list.append(self.player_sprite)
         self.physics_sprite_list.append(self.player_sprite)
+
+
+        cx = SCREEN_WIDTH / 2
+        cy = 32
+        mass = 12
+        sprite = MothershipSprite("images/mothership.png",
+                                       x=cx, y=cy,
+                                       mass=mass,
+                                       space=self.space,
+                                       width=256, height=64)
+        self.player_list.append(sprite)
+        self.physics_sprite_list.append(sprite)
+
+
 
         for asteroid_index in range(30):
             rock_type = random.randrange(2)
